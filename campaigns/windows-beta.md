@@ -47,7 +47,7 @@ Each step activates a skill or runs a command and pastes a short prompt. The pro
 
 ### Phase 1 — Calibrate against the macOS implementation
 
-- [ ] Step 1.1 — Lock the Windows lifecycle contract (ADR 0005)
+- [x] Step 1.1 — Lock the Windows lifecycle contract (ADR 0005)
 
 ### Phase 2 — Build the runtime scaffold
 
@@ -248,6 +248,7 @@ REQUIRED READING:
 1. .github/workflows/ci.yml
 2. scripts/validate.sh
 3. plugins/app-it-windows/ (whole new tree from steps 2.x)
+4. .claude-plugin/marketplace.json and .agents/plugins/marketplace.json (both still list only app-it as of step 2.1)
 
 OUTPUT:
 - .github/workflows/ci.yml — add a windows-latest job alongside the existing macos-latest job. It must:
@@ -255,7 +256,8 @@ OUTPUT:
   - `dotnet restore` and `dotnet build` the wrapper-windows project.
   - Parse-validate the plugin manifests (.claude-plugin + .codex-plugin) as JSON/TOML.
   - Run placeholder-icon-gen.ps1 end-to-end and verify it produces a readable .ico.
-- scripts/validate.sh — print a clear "Windows plugin present (beta) — validated in CI, not on macOS — see docs/WINDOWS.md" notice. Do not pretend to validate the .ps1 / .cs from a Mac.
+- .claude-plugin/marketplace.json AND .agents/plugins/marketplace.json — register app-it-windows as a second plugin entry (source ./plugins/app-it-windows), mirroring the existing app-it entry. Step 2.1 deliberately left these untouched (a sibling plugin isn't truly installable until registered, but registering it breaks validate.sh's hardcoded single-plugin assertions — which this step owns). Keep the beta framing in the entry's description/tags.
+- scripts/validate.sh — (1) generalize the hardcoded `len(market["plugins"]) == 1` and `plugins[0]`-by-index assertions to look up entries by name and assert BOTH app-it and app-it-windows are present and well-formed; (2) require the new files (both app-it-windows manifests + SKILL.md); (3) print a clear "Windows plugin present (beta) — validated in CI, not on macOS — see docs/WINDOWS.md" notice; do not pretend to validate the .ps1 / .cs from a Mac. NOTE: validate.sh is already red at HEAD — its `grep -R "/Users/..."` local-absolute-path guard now trips on campaigns/windows-beta.md (committed during this campaign). Exclude campaigns/ (or the *.md campaign files) from that guard so macOS CI can go green; the campaign markdown legitimately contains absolute paths.
 
 OPEN QUESTIONS:
 - Required for merge, or advisory? Recommendation: required, so a maintainer's PR cannot accidentally regress the scaffold. State that in the workflow's comments.
