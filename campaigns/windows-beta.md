@@ -51,7 +51,7 @@ Each step activates a skill or runs a command and pastes a short prompt. The pro
 
 ### Phase 2 — Build the runtime scaffold
 
-- [ ] Step 2.1 — Stand up the `app-it-windows` plugin shell + Windows `SKILL.md`
+- [x] Step 2.1 — Stand up the `app-it-windows` plugin shell + Windows `SKILL.md`
 - [ ] Step 2.2 — C# WPF + WebView2 host (`wrapper-windows`)
 - [ ] Step 2.3 — PowerShell lifecycle templates
 - [ ] Step 2.4 — Icon pipeline + Windows config block
@@ -189,13 +189,14 @@ REQUIRED READING:
 5. plugins/app-it/skills/app-it/templates/run-template.sh
 6. plugins/app-it/skills/app-it/templates/run-template-chrome.sh
 7. docs/decisions/0005-windows-beta-scope.md
+8. plugins/app-it-windows/skills/app-it-windows/templates/wrapper-windows/README.md (step 2.2 — the host's CLI arg contract + the published `app-it-host.exe` name these scripts must target)
 
 OUTPUT: plugins/app-it-windows/skills/app-it-windows/templates/
 - desktop-build.ps1 — runs `dotnet publish` on the wrapper-windows project, copies the .exe + .ico into desktop/<App Name>/.
 - desktop-install.ps1 — creates the Start Menu shortcut at %APPDATA%\Microsoft\Windows\Start Menu\Programs\app-it\<App Name>.lnk via WScript.Shell COM. Honors APP_IT_INSTALL_DIR.
 - desktop-quit.ps1 — Get-NetTCPConnection to find the port owner, Stop-Process. Matches the lsof+kill behaviour of the macOS version.
 - inspect.ps1 — reads scripts/app-it.config.json, prints a Windows-shaped report. Detects WebView2 runtime presence, .NET SDK presence, port collisions.
-- run-template.ps1 — boots the dev server as a child process inside a JobObject (so the dev server dies when the wrapper dies). Binds 127.0.0.1 only — never 0.0.0.0.
+- run-template.ps1 — the **thin bootstrap** (ADR 0005 seam): augment PATH, pre-flight, scan a free port on 127.0.0.1, then launch the WPF host (`app-it-host.exe`) with the resolved args (`--url --title --icon --slug --port --start-command --working-dir`). The **host** creates the JobObject and spawns the dev server into it — run-template.ps1 must NOT own a job itself (a job created by the short-lived script would close and kill the server when the script returns). Binds 127.0.0.1 only — never 0.0.0.0. (The W-Edge fallback is the one exception — see run-template-edge.ps1.)
 - run-template-edge.ps1 — Edge --app=URL fallback (no wrapper, no custom icon). Equivalent of run-template-chrome.sh.
 
 OPEN QUESTIONS:
