@@ -23,10 +23,10 @@
 # (run-template-edge.ps1) is the one exception: no host there, so that script
 # owns the job itself.
 #
-# Host CLI handoff (the seam with step 2.2 — keep these flag names in sync with
-# wrapper-windows' argument parser):
-#   <App Name>.exe --name <name> --slug <slug> --project-root <path>
-#                  --port <port> --start-command <cmd>
+# Host CLI handoff (the seam with step 2.2 — these flag names match
+# wrapper-windows' HostConfig.Resolve exactly):
+#   <App Name>.exe --url <url> --title <name> --slug <slug> --port <port>
+#                  --start-command <cmd> --working-dir <path> [--icon <ico>]
 #
 # 127.0.0.1 vs 0.0.0.0 (OPEN QUESTION, same shape as macOS): we probe the
 # loopback interface only and export HOST=127.0.0.1. A non-loopback listener
