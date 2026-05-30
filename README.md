@@ -1,53 +1,76 @@
 # app-it
 
-Turn a local web project into a macOS Dock-launchable `.app` bundle.
+Turn a local web project into a macOS Dock-launchable `.app` bundle — a native window, its own Dock icon, and clean start/stop — **without Electron, Tauri, or a rewrite.**
 
-`app-it` is an assistant-agnostic plugin/skill for local developer workflows. It works with Claude Code and Codex, and creates a small, repeatable launcher around an existing local project so double-clicking an app starts the dev server, opens a native window, keeps the Dock icon as your app, and cleans up when you quit.
+![A real app-it build: the Fjord demo running as a native macOS app with its own Dock icon](design/screenshots/01-hero.png)
 
-It is not Electron, Tauri, notarization, auto-update, App Store packaging, or a way to distribute finished apps to customers.
+*A real `app-it` build. `Fjord` is an ordinary local web project (`node server.js`); app-it turned it into a native macOS app with its own Dock icon — no Electron, no browser tab, no terminal left open. This screenshot is the actual generated app, not a mockup.*
 
-## What It Does
+**Status** — Working, in daily use. The launcher templates are battle-tested across 12+ real projects; `v0.1.0` is the first standalone, marketplace-installable release. macOS only, by design.
 
-- Inspects a project before touching files.
-- Chooses a launcher strategy for Vite, Next.js, static sites, and multi-server local apps.
-- Copies proven launcher templates into the target project.
-- Builds a macOS `.app` bundle with a Swift `WKWebView` shell by default.
-- Falls back to Chrome app mode when the project needs Chromium-only browser APIs.
-- Installs generated apps into `~/Applications/App It/` by default.
-- Writes a report explaining what changed and how to undo it.
+**Local-only** — app-it reads your project *on your machine* to choose a launcher strategy. It uploads nothing, runs no telemetry, adds no runtime dependencies, and never touches your business-logic source. The only thing it produces is an `.app` on your own Dock.
+
+`app-it` is an assistant-agnostic plugin/skill. It works with **Claude Code** and **Codex**, and builds a small, repeatable launcher around an existing local project so that double-clicking starts the dev server, opens a native window, keeps the Dock icon as *your* app, and cleans up when you quit.
+
+## What app-it is not
+
+- **Not Electron, Tauri, or a native rewrite.** It wraps your existing dev setup; it doesn't replace it, migrate it, or add a bundler to your dependency tree.
+- **Not a way to ship apps to other people.** No notarization, no App Store, no auto-update, no signed distribution. These are personal, ad-hoc-signed, local-use launchers.
+- **Not cross-platform.** macOS only — and on purpose. Windows is a genuinely different problem (WebView2, `.lnk`, `.ico`, SmartScreen), so it belongs in a separate plugin rather than a blurred promise. See [Compatibility](docs/COMPATIBILITY.md).
+- **Not a hosted service.** Nothing runs in the cloud and there is no live demo to visit — the proof is the app on your own Dock (the screenshot above is one).
+
+## How it works
+
+```text
+  WHAT YOU HAVE               WHAT APP-IT DOES           WHAT YOU GET
+  ───────────────────────     ──────────────────────     ───────────────────────────
+  a local web project         inspects it from disk,     YourApp.app on your Dock
+  Vite, Next, or a static     picks a strategy, then     · its own icon
+  site, run with          ──▶ builds & signs a .app  ──▶ · native window, one click
+  `npm run dev` in a tab      around a WebKit shell      · ⌘Q quits & frees the port
+```
+
+Under the hood, app-it:
+
+- **Inspects before it touches anything** — project type, dev scripts, ports, browser-API needs, icon sources.
+- **Picks a launcher strategy** — a native Swift `WKWebView` shell by default (so the Dock icon stays *yours*), Chrome `--app` mode only when a project needs Chromium-only APIs.
+- **Copies proven, hard-won templates** into the project rather than re-deriving fragile launcher logic each time.
+- **Builds and ad-hoc-signs a real `.app`** — universal (arm64 + x86_64), Gatekeeper-friendly, with a generated `.icns`.
+- **Gets the lifecycle right** — closing the window (⌘W / red-X) leaves the dev server warm for a ~250 ms re-launch; ⌘Q quits the app *and* frees the port.
+- **Writes a report** explaining every change and exactly how to undo it.
 
 ## Requirements
 
 - macOS.
 - Claude Code or Codex for marketplace installation.
-- `swiftc` from Xcode Command Line Tools for the native WebKit shell.
-- Chrome only when the project needs the Chrome fallback path.
-
-Install Xcode Command Line Tools if needed:
-
-```bash
-xcode-select --install
-```
+- `swiftc` (Xcode Command Line Tools) for the native WebKit shell — `xcode-select --install`.
+- Chrome only if a project needs the Chrome fallback path.
 
 ## Install
 
-After this repo is public on GitHub, install it in the assistant you use.
-
-Claude Code:
+**Claude Code:**
 
 ```text
 claude plugin marketplace add Christian-Katzmann/app-it
 claude plugin install app-it@app-it
 ```
 
-Codex:
+**Codex:**
 
 ```text
 codex plugin marketplace add Christian-Katzmann/app-it
 codex plugin add app-it@app-it
 ```
 
-For local development before publication:
+Then, from inside any local web project, ask your assistant:
+
+```text
+/app-it
+```
+
+Natural triggers work too: *"make this clickable from the Dock"*, *"give this an icon"*, *"dockify this"*, *"package this as a local app"*.
+
+### Local development (before publication)
 
 ```text
 claude plugin marketplace add /path/to/app-it
@@ -57,66 +80,50 @@ codex plugin marketplace add /path/to/app-it
 codex plugin add app-it@app-it
 ```
 
-## Manual Skill Install
+### Manual skill install
 
-Marketplace install is preferred. If you only want the skill folder:
+Marketplace install is preferred. To copy just the skill folder:
 
 ```bash
-cp -R plugins/app-it/skills/app-it ~/.claude/skills/app-it
-cp -R plugins/app-it/skills/app-it ~/.codex/skills/app-it
+./install.sh            # auto-detects Claude Code and/or Codex, asks before overwrite
+./install.sh --dry-run  # show what it would do, write nothing
 ```
 
-Reload your tool, then ask:
+## What it adds to a target project
 
-```text
-/app-it
-```
+All additions are additive and reversible:
 
-Natural triggers also work: "make this clickable from the Dock", "give this an icon", "dockify this", or "package this as a local app".
+- `scripts/app-it.config.json` — single source of truth for the app(s)
+- `scripts/desktop-build.sh`, `desktop-install.sh`, `desktop-quit.sh`, `wrapper.swift`, …
+- `assets/<slug>-icon.png` or `.svg`
+- `desktop/<App Name>.app/` *(gitignored — regenerated by the build)*
+- `docs/desktop-launcher.md` and an `app-it-report.md` decision log
+- `package.json` scripts: `desktop:build`, `desktop:install`, `desktop:quit`
 
-## What It Adds To A Target Project
+Installed apps land in `~/Applications/App It/` by default. Drag that folder to the right side of the Dock once and every future appified app appears in its Stack automatically. Override with `APP_IT_INSTALL_DIR`.
 
-Typical additions:
+## Safety model
 
-- `scripts/app-it.config.json`
-- `scripts/desktop-build.sh`
-- `scripts/desktop-install.sh`
-- `scripts/desktop-quit.sh`
-- `scripts/wrapper.swift`
-- `assets/<slug>-icon.png` or `assets/<slug>-icon.svg`
-- `desktop/<App Name>.app/`
-- `docs/desktop-launcher.md`
-- `docs/desktop-launcher.app-it-report.md`
-- `package.json` scripts for `desktop:build`, `desktop:install`, and `desktop:quit`
+`app-it` only makes additive, reversible changes. It will not rewrite product logic, add runtime dependencies, require a terminal window to stay open, or assume an already-running dev server. It may start and stop local dev-server processes during verification. It never collects telemetry, sends project data anywhere, or handles secrets. See [SECURITY.md](SECURITY.md).
 
-The generated `desktop/` bundle and icon build artifacts should be gitignored in the target project.
-
-By default, installed apps are copied to `~/Applications/App It/`. Users who prefer a Dock Stack can drag that folder to the right side of the Dock once. Advanced users can override the destination with `APP_IT_INSTALL_DIR`.
-
-## Safety Model
-
-`app-it` should only make additive, reversible changes. It should not rewrite product logic, add runtime dependencies, require a terminal window to stay open, or assume an already-running dev server.
-
-It may start and stop local dev-server processes during verification. It should never collect telemetry, send project data to a service, or handle secrets.
-
-## Platform Scope
-
-This plugin is macOS-only by design. Windows is not a small variation of the same thing: it needs WebView2 or Edge app mode, `.lnk` or Start Menu integration, `.ico` assets, PowerShell process control, and SmartScreen/signing guidance. That should be a separate plugin rather than a blurred cross-platform promise.
-
-See [Compatibility](docs/COMPATIBILITY.md).
-
-## Validate This Repo
+## Validate this repo
 
 ```bash
 ./scripts/validate.sh
 ```
 
-The validation script checks manifest shape, shell syntax, template presence, plist syntax, Swift typechecking, and Claude plugin validation when the `claude` CLI is available.
+This is the one-command check: it validates manifest shape, shell syntax, template presence, plist syntax, Swift typechecking, and Claude plugin validation (when the `claude` CLI is available). CI runs the same script on `macos-latest`.
 
-## Troubleshooting
+## For AI agents
 
-See [Troubleshooting](docs/TROUBLESHOOTING.md).
+This repo *is* agent tooling, and agents are expected to work in it. Start with [AGENTS.md](AGENTS.md) — it names the non-obvious conventions (templates are canonical, trust disk over docs, the macOS-only boundary) and the safe first commands. Architectural decisions and their rejected alternatives live in [docs/decisions/](docs/decisions/).
+
+## More
+
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Compatibility](docs/COMPATIBILITY.md)
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
 
 ## License
 
-MIT.
+MIT — see [LICENSE](LICENSE).
