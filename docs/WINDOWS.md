@@ -19,10 +19,10 @@ The Windows lane mirrors the macOS one, primitive for primitive. The full reason
 
 ## What works (in theory)
 
-"In theory" is doing real work in that sentence. Everything below is **authored and exercised in CI on `windows-latest`, but never run on a real Windows desktop.** Build-time success is not runtime success.
+"In theory" is doing real work in that sentence. Everything below is **checked by the `windows-latest` CI job on every push (a required gate), but never run on a real Windows desktop.** Build-time success is not runtime success.
 
-- The WPF + WebView2 host **compiles and publishes** to a self-contained single-file `win-x64` `.exe` (CI runs `dotnet build`).
-- The PowerShell lifecycle scripts (`run-template.ps1`, `desktop-build.ps1`, `desktop-install.ps1`, `desktop-quit.ps1`, `inspect.ps1`, `desktop-icons.ps1`, the Edge fallback) **lint clean** under `Invoke-ScriptAnalyzer -Severity Error,Warning`.
+- The WPF + WebView2 host **compiles** to a self-contained single-file `win-x64` `.exe` (CI runs `dotnet build`).
+- The PowerShell lifecycle scripts (`run-template.ps1`, `desktop-build.ps1`, `desktop-install.ps1`, `desktop-quit.ps1`, `inspect.ps1`, `desktop-icons.ps1`, the Edge fallback) **lint clean** under PSScriptAnalyzer at Error + Warning (per [`PSScriptAnalyzerSettings.psd1`](../plugins/app-it-windows/skills/app-it-windows/templates/PSScriptAnalyzerSettings.psd1), which excludes only `PSAvoidUsingWriteHost` — Write-Host is the intended console output here).
 - The plugin manifests and `app-it.config.json` **parse**.
 - `placeholder-icon-gen.ps1` **round-trips** to a readable multi-resolution `.ico`.
 

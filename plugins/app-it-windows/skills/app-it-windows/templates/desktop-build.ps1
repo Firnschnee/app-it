@@ -1,4 +1,4 @@
-# macOS sibling: desktop-build.sh — builds the per-app desktop launchers for
+﻿# macOS sibling: desktop-build.sh — builds the per-app desktop launchers for
 #   every entry in scripts/app-it.config.json. Idempotent.
 #
 # Windows beta · scaffolded · untested on real hardware · maintainer wanted.

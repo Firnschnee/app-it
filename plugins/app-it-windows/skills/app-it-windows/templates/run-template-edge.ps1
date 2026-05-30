@@ -1,4 +1,4 @@
-# macOS sibling: run-template-chrome.sh — the browser --app fallback launcher,
+﻿# macOS sibling: run-template-chrome.sh — the browser --app fallback launcher,
 #   used when the native shell is unavailable or the app needs Chromium-only
 #   Web APIs. (macOS uses Chrome --app; Windows uses Edge --app.)
 #

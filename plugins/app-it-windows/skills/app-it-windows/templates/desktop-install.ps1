@@ -1,4 +1,4 @@
-# macOS sibling: desktop-install.sh — installs every built launcher into the
+﻿# macOS sibling: desktop-install.sh — installs every built launcher into the
 #   user's app folder. (macOS: copies desktop\*.app into ~/Applications/App It/,
 #   a Dock Stack. Windows: creates a Start Menu .lnk per app under an "app-it"
 #   Programs folder — the Windows equivalent of that one-folder Dock Stack.)

@@ -210,7 +210,7 @@ The Windows verification matrix has a **third bucket that does not exist on macO
 | # | Check | From a Mac? | Idiom / who verifies |
 |---|---|---|---|
 | 1 | Wrapper builds | `[x]` build | `dotnet publish -c Release -r win-x64 --self-contained` succeeds; single-file `.exe` emitted. **CI runs this on `windows-latest`.** |
-| 2 | PowerShell scripts lint clean | `[x]` build | `Invoke-ScriptAnalyzer -Severity Error,Warning` returns no findings (CI). |
+| 2 | PowerShell scripts lint clean | `[x]` build | `Invoke-ScriptAnalyzer` returns no findings at Error + Warning under `PSScriptAnalyzerSettings.psd1` (CI). |
 | 3 | Manifests parse | `[x]` build | both `plugin.json` manifests are valid JSON; `app-it.config.json` parses. |
 | 4 | Placeholder icon round-trips | `[x]` build | `placeholder-icon-gen.ps1` emits a readable multi-res `.ico` (CI, on `windows-latest`). |
 | 5 | `.exe` launches a window and renders the URL | `[ ] needs a Windows maintainer` | requires a Windows desktop session. |

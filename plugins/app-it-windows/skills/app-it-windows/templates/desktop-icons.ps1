@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # Generates <App Name>.ico from assets/<slug>-icon.{png,svg} for one app.
 #
 # v2 parity with desktop-icons.sh (macOS sibling):

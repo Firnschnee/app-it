@@ -1,4 +1,4 @@
-# macOS sibling: desktop-quit.sh — stop the persistent dev servers spawned by
+﻿# macOS sibling: desktop-quit.sh — stop the persistent dev servers spawned by
 #   the desktop launchers, plus any open wrapper windows.
 #
 # Windows beta · scaffolded · untested on real hardware · maintainer wanted.
@@ -27,8 +27,7 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Root      = if ($env:APP_IT_PROJECT_ROOT) { $env:APP_IT_PROJECT_ROOT } else { (Resolve-Path (Join-Path $ScriptDir '..')).Path }
+$ScriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ConfigFile = Join-Path $ScriptDir 'app-it.config.json'
 
 # --- Load apps from JSON (preferred) or a placeholder record (template) -------
@@ -79,15 +78,20 @@ $script:ClosedAny = $false
 #   2. Sweep whoever still owns the listening port (re-parented children).
 #   3. Wait up to ~1.5s, then force-kill stragglers.
 function Stop-ProcessTree {
+    # ConfirmImpact=Low keeps this prompt-free under the default $ConfirmPreference
+    # (High), so the unattended desktop:quit path never blocks; -WhatIf still works.
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
     param([int]$ProcessId)
     if (-not $ProcessId) { return }
     # Depth-first: children before the parent, so the parent can't re-spawn.
     $children = Get-CimInstance Win32_Process -Filter "ParentProcessId=$ProcessId" -ErrorAction SilentlyContinue
     foreach ($child in $children) { Stop-ProcessTree -ProcessId ([int]$child.ProcessId) }
-    Stop-Process -Id $ProcessId -Force -ErrorAction SilentlyContinue
+    if ($PSCmdlet.ShouldProcess("PID $ProcessId", 'Stop process tree')) {
+        Stop-Process -Id $ProcessId -Force -ErrorAction SilentlyContinue
+    }
 }
 
-function Get-PortOwners {
+function Get-PortOwner {
     param([int]$Port)
     if (-not $Port) { return @() }
     try {
@@ -115,18 +119,18 @@ function Invoke-PortSweep {
         }
     }
 
-    foreach ($owner in Get-PortOwners -Port $port) {
+    foreach ($owner in Get-PortOwner -Port $port) {
         Stop-ProcessTree -ProcessId ([int]$owner)
         $closed = $true
     }
 
     # Wait up to 1.5s, then hard-kill anything still bound.
-    if (Get-PortOwners -Port $port) {
+    if (Get-PortOwner -Port $port) {
         for ($i = 0; $i -lt 3; $i++) {
-            if (-not (Get-PortOwners -Port $port)) { break }
+            if (-not (Get-PortOwner -Port $port)) { break }
             Start-Sleep -Milliseconds 500
         }
-        foreach ($owner in Get-PortOwners -Port $port) {
+        foreach ($owner in Get-PortOwner -Port $port) {
             Stop-Process -Id ([int]$owner) -Force -ErrorAction SilentlyContinue
             $closed = $true
         }

@@ -22,7 +22,7 @@
 | Primary shell | C# WPF + WebView2 host → self-contained single-file `.exe` |
 | Fallback shell | Edge `--app=` mode |
 | Install destination | `app-it\` Start Menu group via `.lnk` |
-| Status | Builds and lints in CI on `windows-latest`; **nobody has run it on Windows yet** |
+| Status | Build + lint gated by a required `windows-latest` CI job; **nobody has run it on Windows yet** |
 
 The author runs only macOS and will not dogfood the Windows build, so it ships as an honest beta looking for a maintainer rather than a finished feature. Everything a Mac can produce is built and CI-guarded; everything that needs real hardware to confirm is marked as deferred. See **[docs/WINDOWS.md](WINDOWS.md)** for what works in theory, what a first PR looks like, and how to claim a check.
 

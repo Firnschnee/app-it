@@ -41,10 +41,13 @@ jobs:
         shell: pwsh
         run: |
           $templates = 'plugins/app-it-windows/skills/app-it-windows/templates'
+          $settings  = Join-Path $templates 'PSScriptAnalyzerSettings.psd1'
           $scripts   = Get-ChildItem -Path $templates -Filter '*.ps1' -Recurse
           $failed    = [System.Collections.Generic.List[string]]::new()
           foreach ($s in $scripts) {
-            $results = Invoke-ScriptAnalyzer -Path $s.FullName -Severity 'Error','Warning'
+            # Severity (Error + Warning) and the one documented rule exclusion
+            # (PSAvoidUsingWriteHost) live in PSScriptAnalyzerSettings.psd1.
+            $results = Invoke-ScriptAnalyzer -Path $s.FullName -Settings $settings
             if ($results) {
               $results | ForEach-Object {
                 Write-Warning "$($s.Name) [$($_.RuleName) line $($_.Line)]: $($_.Message)"

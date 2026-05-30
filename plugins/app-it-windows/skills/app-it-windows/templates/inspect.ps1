@@ -1,4 +1,4 @@
-# macOS sibling: inspect.sh — Phase 1 read-only inspection helper. Emits a
+﻿# macOS sibling: inspect.sh — Phase 1 read-only inspection helper. Emits a
 #   one-page report covering everything the agent needs to decide strategy
 #   before touching any files.
 #

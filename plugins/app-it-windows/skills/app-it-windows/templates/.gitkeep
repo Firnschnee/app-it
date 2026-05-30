@@ -1,5 +1,0 @@
-# Windows templates land here across campaign steps 2.2–2.4:
-#   2.2 — wrapper-windows/ (C# WPF + WebView2 host)
-#   2.3 — *.ps1 lifecycle scripts (build / install / quit / inspect / run / run-edge)
-#   2.4 — desktop-icons.ps1, placeholder-icon-gen.ps1, app-it.config.example.json
-# Until then this directory is intentionally empty. See ../SKILL.md "Templates folder".

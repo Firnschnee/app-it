@@ -1,4 +1,4 @@
-# macOS sibling: run-template.sh — the native-shell launcher. (macOS: ensures
+﻿# macOS sibling: run-template.sh — the native-shell launcher. (macOS: ensures
 #   the dev server is up, then execs the Swift WebKit wrapper. Windows: the thin
 #   bootstrap that hands off to the WPF + WebView2 host.)
 #
@@ -34,7 +34,9 @@
 # the macOS firewall prompt); loopback never does. A local launcher is never
 # meant to be reachable off-box, so loopback-only is correct.
 #
-# Substituted by desktop-build.ps1:
+### TEMPLATE-DOCS-START
+# Substituted by desktop-build.ps1 (this block is stripped from the generated
+# run.ps1 by Expand-Template, so the real values never leak into its comments):
 #   __APP_NAME__       human display name (e.g. "Momo Studio")
 #   __APP_SLUG__       file-safe slug (e.g. "momo-studio")
 #   __PROJECT_ROOT__   absolute path to the repo (baked at build time)
@@ -42,6 +44,7 @@
 #   __START_COMMAND__  command to start the dev server from PROJECT_ROOT; must
 #                      honor the PORT env var (Vite needs it via CLI:
 #                      `npm run dev -- --port $env:PORT`).
+### TEMPLATE-DOCS-END
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest

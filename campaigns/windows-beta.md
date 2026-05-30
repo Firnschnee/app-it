@@ -60,7 +60,7 @@ Each step activates a skill or runs a command and pastes a short prompt. The pro
 
 - [x] Step 3.1 — Windows CI lane + `validate.sh` extension
 - [x] Step 3.2 — Framing docs (`WINDOWS.md`, `COMPATIBILITY` update, `README` beta callout, `CONTRIBUTING`)
-- [ ] Final review
+- [x] Final review
 
 Each step heading is followed by a `Model:` line (recommended agent + thinking effort) and a `Parallel:` line (which sibling steps can run alongside it).
 

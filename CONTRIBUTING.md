@@ -2,7 +2,7 @@
 
 ## Windows maintainer wanted
 
-The Windows lane (`plugins/app-it-windows/`) is a **beta scaffold** — built and CI-guarded from macOS, but never run on real Windows hardware, because the author runs only macOS. If you're a Windows user, this is the highest-leverage contribution in the repo: verifying the seams a Mac can't. Fast review, full credit in the changelog, co-maintainer status if you stick around. Start at **[docs/WINDOWS.md](docs/WINDOWS.md)** — it lays out what works in theory, what a first PR looks like, and how to claim a check.
+The Windows lane (`plugins/app-it-windows/`) is a **beta scaffold** — built from macOS and gated by a required `windows-latest` CI job, but never run on real Windows hardware, because the author runs only macOS. If you're a Windows user, this is the highest-leverage contribution in the repo: verifying the seams a Mac can't. Fast review, full credit in the changelog, co-maintainer status if you stick around. Start at **[docs/WINDOWS.md](docs/WINDOWS.md)** — it lays out what works in theory, what a first PR looks like, and how to claim a check.
 
 ## macOS contributions
 

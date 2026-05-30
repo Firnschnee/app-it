@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # Last-resort placeholder icon generator. Produces assets/<slug>-icon.svg
 # (or .png when ImageMagick is absent) when no usable square brand mark exists.
 # Mirrors placeholder-icon-gen.sh exactly: same three motifs, same brand-token
