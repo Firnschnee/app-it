@@ -52,7 +52,7 @@ Each step activates a skill or runs a command and pastes a short prompt. The pro
 ### Phase 2 — Build the runtime scaffold
 
 - [x] Step 2.1 — Stand up the `app-it-windows` plugin shell + Windows `SKILL.md`
-- [ ] Step 2.2 — C# WPF + WebView2 host (`wrapper-windows`)
+- [x] Step 2.2 — C# WPF + WebView2 host (`wrapper-windows`)
 - [ ] Step 2.3 — PowerShell lifecycle templates
 - [ ] Step 2.4 — Icon pipeline + Windows config block
 
@@ -225,7 +225,7 @@ REQUIRED READING:
 4. docs/decisions/0005-windows-beta-scope.md (icon section)
 
 OUTPUT:
-- plugins/app-it-windows/skills/app-it-windows/templates/desktop-icons.ps1 — PNG/SVG → 16/32/48/256 multi-resolution .ico. ImageMagick path when present (faster); System.Drawing fallback so it works on stock Windows.
+- plugins/app-it-windows/skills/app-it-windows/templates/desktop-icons.ps1 — PNG/SVG → 16/32/48/256 multi-resolution .ico. ImageMagick path when present (faster); System.Drawing fallback so it works on stock Windows. CONTRACT WITH STEP 2.3: desktop-build.ps1 already invokes this script per-app with `$env:APP_NAME`, `$env:APP_SLUG`, and `$env:APP_IT_PROJECT_ROOT` set, then expects the finished icon at `<root>\desktop\<App Name>\<App Name>.ico` (desktop-install.ps1 points the .lnk IconLocation there, and the host's --icon flag reads the same path). Honor exactly that input (the three env vars) and that output path; when no source art exists, fall back to placeholder-icon-gen.ps1 so the build never fails on a missing icon.
 - plugins/app-it-windows/skills/app-it-windows/templates/placeholder-icon-gen.ps1 — generates a placeholder .ico the same way placeholder-icon-gen.sh generates an .icns, so the build never fails on a missing icon.
 - plugins/app-it-windows/skills/app-it-windows/templates/app-it.config.example.json — same schema as macOS, with a documented optional `platform.windows` block (e.g., webview2_user_data_dir).
 
