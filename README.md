@@ -6,6 +6,10 @@ Turn a local web project into a macOS Dock-launchable `.app` bundle — a native
 
 *A real `app-it` build. `Fjord` is an ordinary local web project (`node server.js`); app-it turned it into a native macOS app with its own Dock icon — no Electron, no browser tab, no terminal left open. This screenshot is the actual generated app, not a mockup.*
 
+![The app-it lifecycle: double-click the Dock icon, a native window opens, ⌘Q quits and frees the port](design/motion/app-it-lifecycle.gif)
+
+*The same build, in motion: double-click launches it, the native window opens, and ⌘Q quits the app **and** frees the dev-server port. Animated from that same real window capture.*
+
 **Status** — Working, in daily use. The launcher templates are battle-tested across 12+ real projects; `v0.1.0` is the first standalone, marketplace-installable release. macOS only, by design.
 
 **Local-only** — app-it reads your project *on your machine* to choose a launcher strategy. It uploads nothing, runs no telemetry, adds no runtime dependencies, and never touches your business-logic source. The only thing it produces is an `.app` on your own Dock.
