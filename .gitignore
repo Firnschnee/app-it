@@ -13,3 +13,7 @@ docs/desktop-launcher.app-it-report.md
 
 # Local validation output.
 .tmp/
+
+# Python bytecode (validate.sh syntax-checks static-server.py).
+__pycache__/
+*.pyc

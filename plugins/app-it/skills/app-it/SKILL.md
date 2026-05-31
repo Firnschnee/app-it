@@ -360,6 +360,8 @@ Opt-in `APP_IT_CHROME_KEEP_WARM=0` makes Chrome exit also tear down the daemon (
 
 Adapt `run-template.sh`: drop the daemon-server block, point the URL at `file://$PROJECT_ROOT/<dist>/index.html`, hand off to `wrapper`. Pass empty string for the port argv.
 
+> For a *finished/buildable* app whose whole point is to skip the dev server, the **`app-it-static`** companion skill is the better tool: it detects the build command and output dir, builds once, and serves the result from a tiny static server or `file://` — with a proper snapshot/`desktop:rebuild` model. Use it when static serving is the goal, not just an A2 corner case.
+
 ## A3 — Multi-server cohabiting app
 
 Three sub-strategies — pick by project context:

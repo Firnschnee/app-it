@@ -41,11 +41,14 @@ Under the hood, app-it:
 - **Gets the lifecycle right** — closing the window (⌘W / red-X) leaves the dev server warm for a ~250 ms re-launch; ⌘Q quits the app *and* frees the port.
 - **Writes a report** explaining every change and exactly how to undo it.
 
+> **Finished app? There's a lighter companion.** `app-it` runs your project's dev server — perfect while you're still building. Once an app is *done*, it doesn't need one: the **`app-it-static`** companion serves the built output (`dist/`, `build/`, `out/`, …) so a finished app costs ~15 MB instead of a dev server's ~300–700 MB. Same native window, same Dock Stack — reach for it only when an app is done. [How it works →](plugins/app-it-static/skills/app-it-static/SKILL.md)
+
 ## Requirements
 
 - macOS.
 - Claude Code or Codex for marketplace installation.
 - `swiftc` (Xcode Command Line Tools) for the native WebKit shell — `xcode-select --install`.
+- `python3` (also from the Xcode Command Line Tools) for `app-it-static`'s server mode.
 - Chrome only if a project needs the Chrome fallback path.
 
 ## Install
@@ -71,6 +74,8 @@ Then, from inside any local web project, ask your assistant:
 ```
 
 Natural triggers work too: *"make this clickable from the Dock"*, *"give this an icon"*, *"dockify this"*, *"package this as a local app"*.
+
+*Optional:* for finished apps, also install the lighter companion — `claude plugin install app-it-static@app-it` (or `codex plugin add app-it-static@app-it`), then run `/app-it-static`.
 
 ### Local development (before publication)
 
@@ -129,6 +134,14 @@ This repo *is* agent tooling, and agents are expected to work in it. Start with 
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 - [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+
+## Community nudge
+
+The `app-it-static` companion was inspired by feedback from the r/ClaudeAI launch thread. Thanks to:
+
+- **`TechExpert2910`** for pointing out that finished apps shouldn't need a full dev server, and that Vercel/PWA-style workflows are far lighter — the nudge that became "serve the build locally, not a dev server."
+- **`K_M_A_2k`** for highlighting that deployed/static proof-of-concepts are often the standard workflow and are easier to share.
+- **`Vo_Mimbre`** for the corporate-environment caveat: external hosting like Vercel isn't always approved, which is exactly why a *local* static launcher earns its place even for finished projects.
 
 ## License
 

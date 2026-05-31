@@ -13,6 +13,24 @@
 | Install destination | `~/Applications/App It/` by default |
 | Signing | Ad-hoc local code signing only |
 
+## Companion · `app-it-static`
+
+For **finished or buildable** apps, the `app-it-static` sibling plugin serves the
+built output instead of booting a dev server — a tiny static server (~15 MB) or
+`file://` (~0 MB), versus the 300–700 MB a dev server holds.
+
+| Area | Support |
+| --- | --- |
+| OS | macOS |
+| Shell | Swift `WKWebView` wrapper (shared with `app-it`, byte-identical) |
+| Serve modes | tiny `static-server.py` (default) · `file://` (zero-server, when build is flat) |
+| Common targets | Vite, CRA, Astro, SvelteKit (static adapter), Next (`output: 'export'`), hand-written static sites |
+| Extra requirement | `python3` (server mode) — ships with the Xcode Command Line Tools |
+| Model | serves a **snapshot**; `desktop:rebuild` refreshes it |
+
+Use `app-it` when the project is still live/in-progress; use `app-it-static` once
+it's finished. See [ADR 0006](decisions/0006-static-companion-snapshot-model.md).
+
 ## Beta · maintainer wanted
 
 | Area | Support |

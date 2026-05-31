@@ -18,13 +18,15 @@ It checks manifest shape, shell syntax (`bash -n`), plist lint, a Swift typechec
 
 ## What this repo is
 
-One skill, packaged as a plugin for **two** assistants. That's why some files look duplicated — they aren't:
+Three sibling plugins, each packaged for **two** assistants (Claude Code + Codex). That's why some files look duplicated — they aren't:
 
-- The skill: `plugins/app-it/skills/app-it/SKILL.md` (+ `templates/`).
-- Claude packaging: `.claude-plugin/marketplace.json`, `plugins/app-it/.claude-plugin/plugin.json`.
-- Codex packaging: `.agents/plugins/marketplace.json`, `plugins/app-it/.codex-plugin/plugin.json`.
+- **`app-it`** (macOS, proven, daily use) — runs a project's *dev server* behind a native window. `plugins/app-it/skills/app-it/SKILL.md` (+ `templates/`).
+- **`app-it-static`** (macOS, companion) — serves a *finished build* (no dev server). `plugins/app-it-static/skills/app-it-static/SKILL.md` (+ `templates/`).
+- **`app-it-windows`** (beta scaffold, maintainer wanted) — the Windows sibling. `plugins/app-it-windows/skills/app-it-windows/SKILL.md`.
 
-The four manifests carry the **same version**. `validate.sh` asserts it; releases bump them together (see [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)).
+Each plugin has Claude packaging (`.claude-plugin/`) and Codex packaging (`.codex-plugin/` + the shared `.agents/plugins/marketplace.json`). A plugin's manifests carry the **same version** (the coupling is per-plugin, not across plugins). `validate.sh` asserts it; releases bump them together (see [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)).
+
+**`app-it-static` reuses five `app-it` templates byte-for-byte** — `wrapper.swift`, `desktop-icons.sh`, `desktop-install.sh`, `info-plist-template.xml`, `placeholder-icon-gen.sh`. Each plugin must be self-contained for marketplace install, so they're duplicated, but `validate.sh` diffs them and **fails on drift**. If you change launcher internals, edit `app-it`'s copy and re-sync `app-it-static`'s — never let them diverge.
 
 ## Conventions that will surprise you
 
