@@ -2,9 +2,9 @@
 
 Turn a local web project into a macOS Dock-launchable `.app` bundle — a native window, its own Dock icon, and clean start/stop — **without Electron, Tauri, or a rewrite.**
 
-![A real app-it build: double-click the Fjord demo's Dock icon, its native window opens, ⌘Q quits and frees the port](design/motion/app-it-lifecycle.gif)
+![A macOS Dock Stack full of real app-it builds — Mission Control, Campaigns, monëy, Heartbeat, Repo Hunter and more, each with its own icon](design/screenshots/01-myapps-stack.jpg)
 
-*A real `app-it` build, in motion. `Fjord` is an ordinary local web project (`node server.js`); app-it turns it into a native macOS app — double-click launches it, the window opens with its own Dock icon, and ⌘Q quits the app **and** frees the dev-server port. The actual generated app, not a mockup.*
+*What your Dock looks like after app-it. Every one of these is an ordinary local web project turned into a native macOS app — its own icon, its own window, one click to launch. This is a real `MyApps` Stack, not a mockup; each icon is an app app-it built.*
 
 **Status** — Working, in daily use. The launcher templates are battle-tested across 12+ real projects; `v0.1.0` is the first standalone, marketplace-installable release. macOS only, by design.
 
@@ -19,7 +19,7 @@ Turn a local web project into a macOS Dock-launchable `.app` bundle — a native
 - **Not Electron, Tauri, or a native rewrite.** It wraps your existing dev setup; it doesn't replace it, migrate it, or add a bundler to your dependency tree.
 - **Not a way to ship apps to other people.** No notarization, no App Store, no auto-update, no signed distribution. These are personal, ad-hoc-signed, local-use launchers.
 - **Not cross-platform.** macOS only — and on purpose. Windows is a genuinely different problem (WebView2, `.lnk`, `.ico`, SmartScreen), so it belongs in a separate plugin rather than a blurred promise. See [Compatibility](docs/COMPATIBILITY.md).
-- **Not a hosted service.** Nothing runs in the cloud and there is no live demo to visit — the proof is the app on your own Dock (the screenshot above is one).
+- **Not a hosted service.** Nothing runs in the cloud and there is no live demo to visit — the proof is the apps on your own Dock (the Stack at the top is real).
 
 ## How it works
 
@@ -31,6 +31,10 @@ Turn a local web project into a macOS Dock-launchable `.app` bundle — a native
   site, run with          ──▶ builds & signs a .app  ──▶ · native window, one click
   `npm run dev` in a tab      around a WebKit shell      · ⌘Q quits & frees the port
 ```
+
+![A real app-it build in motion: double-click the Fjord demo's Dock icon, its native window opens, ⌘Q quits and frees the port](design/motion/app-it-lifecycle.gif)
+
+*The same lifecycle, running. `Fjord` is an ordinary local web project (`node server.js`); app-it turns it into a native macOS app — double-click launches it, the window opens with its own Dock icon, and ⌘Q quits the app **and** frees the dev-server port.*
 
 Under the hood, app-it:
 
