@@ -1,6 +1,11 @@
 # Security
 
-`app-it` is a local developer tool. It should not collect telemetry, upload project files, or send source code to any service.
+`app-it` is a personal, open-source project, maintained by one developer in their
+spare time and offered under the MIT [LICENSE](LICENSE) with no warranty. It is an
+independent community tool, **not affiliated with or endorsed by Anthropic or OpenAI.**
+
+It is a local developer tool. It should not collect telemetry, upload project
+files, or send source code to any service.
 
 ## What It Can Do
 
@@ -16,6 +21,16 @@
 - Send project data over the network.
 - Claim that ad-hoc signed local `.app` bundles are notarized or ready for distribution.
 
-## Reporting Issues
+## Reporting a Vulnerability
 
-Open a GitHub issue with a minimal reproduction. Do not include secrets, private `.env` values, customer data, or proprietary source code.
+For a normal bug, open a public [GitHub issue](https://github.com/Christian-Katzmann/app-it/issues)
+with a minimal reproduction.
+
+For something security-sensitive that shouldn't be public yet, please report it
+privately instead of opening an issue: use GitHub's
+[private vulnerability reporting](https://github.com/Christian-Katzmann/app-it/security/advisories/new)
+on this repository. As a one-person project there is no formal SLA, but reports
+are read and triaged in good faith, and fixes are prioritized by severity.
+
+Either way, do not include secrets, private `.env` values, customer data, or
+proprietary source code in your report.

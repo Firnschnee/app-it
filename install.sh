@@ -4,6 +4,14 @@
 # Marketplace install is preferred. This script is for local development or users
 # who want to copy the skill folder directly.
 #
+# What this touches on your machine (and nothing else):
+#   - Copies plugins/app-it/skills/app-it/ into ~/.claude/skills/app-it and/or
+#     ~/.codex/skills/app-it, for whichever of those two tools it detects.
+#   - If a target folder already exists it asks before replacing it (--force skips
+#     the prompt; --dry-run writes nothing and just prints what it would do).
+# It writes nowhere else, downloads nothing, needs no sudo, and runs no code from
+# the network. Read it end to end before running — it is intentionally short.
+#
 # Usage:
 #   ./install.sh               # auto-detect tools, ask before overwrite
 #   ./install.sh --force       # overwrite without asking
