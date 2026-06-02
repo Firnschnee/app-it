@@ -143,6 +143,7 @@ The `app-it-static` companion was inspired by feedback from the r/ClaudeAI launc
 - **`K_M_A_2k`** for highlighting that deployed/static proof-of-concepts are often the standard workflow and are easier to share.
 - **`Vo_Mimbre`** for the corporate-environment caveat: external hosting like Vercel isn't always approved, which is exactly why a *local* static launcher earns its place even for finished projects.
 - **`Firnschnee`** for the first real-hardware Windows validation, fixing the WebView2 window-title bug and proving the Windows beta actually runs.
+- **`SohamKela`** for hardening the native window so a restored frame can't open off-screen or postage-stamp sized, and adding first-class Vite + React, SvelteKit, and Astro dev recipes.
 
 ## License
 
