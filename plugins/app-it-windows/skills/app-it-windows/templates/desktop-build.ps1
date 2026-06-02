@@ -82,16 +82,15 @@ $runTemplateEdge     = Join-Path $ScriptDir 'run-template-edge.ps1'
 # Locate the wrapper-windows .csproj near these templates (step 2.2). Override
 # with APP_IT_WRAPPER_CSPROJ. Unlike the former single shared publish, each app
 # is published separately so its name can be baked into the assembly metadata
-# (issue #9): -p:AssemblyName="<App Name>" sets the embedded FileDescription /
-# ProductName (they inherit from AssemblyName, which the .csproj leaves at its
-# default), and those are what the Windows taskbar right-click reads. A shared
-# binary can't carry per-app identity because the version resource is baked at
-# compile time; rewriting it post-publish would need an external resource editor
-# (rcedit), which the no-dependencies contract rules out. Per-app exes are cached
-# under assets\build\wrapper-windows\<slug>\ and reused unless a source is newer.
-$csproj    = $null
-$projDir   = $null
-$newestSrc = $null
+# (issue #9). A shared binary can't carry per-app identity because the version
+# resource is baked at compile time; rewriting it post-publish would need an
+# external resource editor (rcedit), which the no-dependencies contract rules
+# out. Per-app exes are cached under assets\build\wrapper-windows\<slug>\ and
+# reused unless a host source file is newer.
+$csproj       = $null
+$projDir      = $null
+$newestSrc    = $null
+$newestSrcUtc = [datetime]::MinValue
 if ($globalMode -eq 'webview2') {
     if ($env:APP_IT_WRAPPER_CSPROJ -and (Test-Path $env:APP_IT_WRAPPER_CSPROJ)) {
         $csproj = $env:APP_IT_WRAPPER_CSPROJ
@@ -108,50 +107,55 @@ if ($globalMode -eq 'webview2') {
         $projDir = Split-Path -Parent $csproj
         $newestSrc = Get-ChildItem -Path $projDir -Recurse -Include *.cs,*.csproj,*.xaml -ErrorAction SilentlyContinue |
             Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+        if ($newestSrc) { $newestSrcUtc = $newestSrc.LastWriteTimeUtc }
     }
 }
 
 # Publish the host for one app, baking the app name into the assembly so the
-# taskbar right-click, FileDescription and OriginalFilename read the app name
-# instead of "app-it-host" (issue #9). Cached per slug, mtime-aware. Returns the
-# published "<App Name>.exe" path, or $null on a build failure (the caller then
-# falls that app back to the Edge launcher).
+# taskbar right-click and FileDescription read the app name instead of
+# "app-it-host" (issue #9). Identity is split from the file name on purpose:
+#   * -p:AssemblyName=<Slug>   -> the published file is "<slug>.exe". The slug is
+#     [a-z0-9-], so it's always a valid assembly/file name and the cache lookup
+#     below is exact - no MSBuild char-stripping to second-guess.
+#   * -p:AssemblyTitle / -p:Product = <App Name> -> these set the embedded
+#     FileDescription + ProductName, which is what the Windows taskbar actually
+#     reads (verified on Windows 11). The .csproj sets neither, so nothing to
+#     override; the free-form app name never has to be a valid file name.
+# The desktop copy step renames "<slug>.exe" to "<App Name>.exe" for the visible
+# file + process name. Cached per slug, mtime-aware. Build inputs are passed in
+# rather than read from script scope. Returns the published "<slug>.exe" path,
+# or $null on a build failure (the caller falls that app back to Edge).
 function Publish-HostForApp {
-    param([string]$AppName, [string]$Slug)
+    param(
+        [string]$AppName,
+        [string]$Slug,
+        [string]$Csproj,
+        [string]$RepoRoot,
+        [datetime]$NewestSrcUtc
+    )
 
-    $appPublishDir = Join-Path $Root "assets\build\wrapper-windows\$Slug"
-    $existing = if (Test-Path $appPublishDir) {
-        Get-ChildItem -Path $appPublishDir -Filter "$AppName.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-    } else { $null }
-    $needsBuild = (-not $existing) -or ($newestSrc -and $newestSrc.LastWriteTimeUtc -gt $existing.LastWriteTimeUtc)
+    $appPublishDir = Join-Path $RepoRoot "assets\build\wrapper-windows\$Slug"
+    $exePath  = Join-Path $appPublishDir "$Slug.exe"
+    $existing = Get-Item -LiteralPath $exePath -ErrorAction SilentlyContinue
+    $needsBuild = (-not $existing) -or ($existing.LastWriteTimeUtc -lt $NewestSrcUtc)
 
     if ($needsBuild) {
-        Write-Host "Publishing WebView2 host for '$AppName': $csproj"
-        # -p:AssemblyName="<App Name>" names the output <App Name>.exe and, since
-        # the .csproj sets neither AssemblyTitle nor Product, cascades into the
-        # embedded FileDescription + ProductName (verified on Windows 11). The
-        # "AssemblyName=$AppName" token carries no literal space, so it survives
-        # native arg-passing under both pwsh 7 (Windows mode) and Windows
-        # PowerShell 5.1 (Legacy). Self-contained single-file per ADR 0005.
-        # Pipe to Out-Host: dotnet's stdout must not leak into the function's
-        # output stream, or the returned $exe path is polluted with build log
-        # lines. Out-Host keeps the progress visible while returning nothing.
-        & dotnet publish $csproj -c Release -r win-x64 --self-contained true `
+        Write-Host "Publishing WebView2 host for '$AppName' (assembly: $Slug): $Csproj"
+        # AssemblyName=$Slug (no spaces/odd chars) and AssemblyTitle/Product=$AppName
+        # are each a single token whose only space comes from the variable value,
+        # so they survive native arg-passing under both pwsh 7 (Windows mode) and
+        # Windows PowerShell 5.1 (Legacy). Self-contained single-file per ADR 0005.
+        # Pipe to Out-Host so dotnet's stdout can't leak into this function's
+        # output stream and pollute the returned path; progress stays visible.
+        & dotnet publish $Csproj -c Release -r win-x64 --self-contained true `
             -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
-            -p:AssemblyName=$AppName `
+            -p:AssemblyName=$Slug -p:AssemblyTitle=$AppName -p:Product=$AppName `
             -o $appPublishDir | Out-Host
         if ($LASTEXITCODE -ne 0) { return $null }
     }
 
-    $exe = Get-ChildItem -Path $appPublishDir -Filter "$AppName.exe" -ErrorAction SilentlyContinue |
+    return Get-Item -LiteralPath $exePath -ErrorAction SilentlyContinue |
         Select-Object -First 1 -ExpandProperty FullName
-    if (-not $exe) {
-        # Name didn't map 1:1 (MSBuild stripped unusual chars) - take the
-        # largest .exe as the host.
-        $exe = Get-ChildItem -Path $appPublishDir -Filter *.exe -ErrorAction SilentlyContinue |
-            Sort-Object Length -Descending | Select-Object -First 1 -ExpandProperty FullName
-    }
-    return $exe
 }
 
 # --- Substitution helper -----------------------------------------------------
@@ -178,9 +182,12 @@ foreach ($app in $apps) {
     # into the assembly metadata (issue #9), so the taskbar entry, process name
     # AND the taskbar right-click all read the app, not "app-it-host".
     if ($appMode -eq 'webview2') {
-        $exe = Publish-HostForApp -AppName $app.name -Slug $app.slug
+        $exe = Publish-HostForApp -AppName $app.name -Slug $app.slug `
+            -Csproj $csproj -RepoRoot $Root -NewestSrcUtc $newestSrcUtc
         if ($exe) {
-            Copy-Item -Force -Path $exe -Destination (Join-Path $appDir "$($app.name).exe")
+            # Rename <slug>.exe -> <App Name>.exe so the visible file and process
+            # name are the app; the embedded FileDescription already carries it.
+            Copy-Item -Force -LiteralPath $exe -Destination (Join-Path $appDir "$($app.name).exe")
         } else {
             Write-Warning "  dotnet publish failed for $($app.name) - falling back to the Edge --app launcher."
             $appMode = 'edge'
