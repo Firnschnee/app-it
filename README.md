@@ -186,6 +186,7 @@ The `app-it-static` companion was inspired by feedback from the r/ClaudeAI launc
 - **`K_M_A_2k`** for highlighting that deployed/static proof-of-concepts are often the standard workflow and are easier to share.
 - **`Vo_Mimbre`** for the corporate-environment caveat: external hosting like Vercel isn't always approved, which is exactly why a *local* static launcher earns its place even for finished projects.
 - **`Firnschnee`** for becoming the Windows beta's real-hardware tester — the first proof it actually runs, then a run of fixes each traced and verified on a real Windows 11 box: the window title, the `app-it-host` label stuck in the taskbar right-click menu, and a graceful path when the WebView2 runtime is missing (offer the installer instead of a dead window).
+- **`jeremyellison`** for the feature request that became Claude Artifact packaging — including the key constraint that distribution must keep every user on their own Claude plan, no shared secrets, which is exactly the boundary the shipped wrapper honors.
 - **`SohamKela`** for hardening the native window so a restored frame can't open off-screen or postage-stamp sized, adding first-class Vite + React, SvelteKit, and Astro dev recipes, and — most recently — the URL-only launcher that wraps a hosted web app (a published Claude Artifact is the common case) in a Dock window: no local server, no shared secrets, each recipient signed into their own account.
 
 ## License
